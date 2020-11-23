@@ -13,4 +13,4 @@ Test your chatbot in Telegram or integrate into your website!
 
 **Enjoy**
 
-*This is made from the [Infermedica Python Demo](https://github.com/infermedica/python-api). Just hit me up if you get a bug or need help* :)
+*This is made from the [Infermedica Python Demo](https://github.com/infermedica/symptom-checker-chatbot-example). Just hit me up if you get a bug or need help* :)
