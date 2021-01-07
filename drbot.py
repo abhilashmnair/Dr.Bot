@@ -5,6 +5,30 @@ import sqlite3
 import re, sys
 import constants
 
+ANSWER_NORM = {
+    "yes": "present",
+    "y": "present",
+    "yep":"present",
+    "yup": "present",
+    "definitely": "present",
+    "sure": "present",
+    "surely": "present",
+    "present": "present",
+    "no": "absent",
+    "n": "absent",
+    "nah": "absent",
+    "nope": "absent",
+    "absent": "absent",
+    "somewhat": "unknown",
+    "sometimes": "unknown",
+    "?": "unknown",
+    "skip": "unknown",
+    "unknown": "unknown",
+    "donno": "unknown",
+    "dont know": "unknown",
+    "don't know": "unknown",
+}
+
 infermedica_url = 'https://api.infermedica.com/v2/{}'
 auth_string = '2876b43e:bdf95f2d0b8ea55069b381d15eeb1f6f'
 
@@ -161,7 +185,7 @@ def webhook():
         for row in cursor.execute("SELECT id FROM ageSex"):
             id = row[0]
         print("test ",id)
-        observation_value = extract_decision(result.get('queryText'), constants.ANSWER_NORM)
+        observation_value = extract_decision(result.get('queryText'), ANSWER_NORM)
         cursor.execute("INSERT INTO evidence VALUES('%s','%s','%s')"%(id,observation_value,False))
         text = conduct_interview()
         return make_response(jsonify({
