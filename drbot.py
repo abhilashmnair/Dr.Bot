@@ -6,7 +6,7 @@ import re, sys
 import constants
 
 infermedica_url = 'https://api.infermedica.com/v2/{}'
-auth_string = 'YOUR_API_ID:YOUR_API_KEY'
+auth_string = '2876b43e:bdf95f2d0b8ea55069b381d15eeb1f6f'
 
 mentions = []
 diagnoses = []
