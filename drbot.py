@@ -163,7 +163,7 @@ def conduct_interview():
         assert len(question_items) == 1
         question_item = question_items[0]
         id = question_item.get('id')
-        firebaseDB.child('case_id').child('ageSex').update({ 'id' : id})
+        firebaseDB.child(case_id).child('ageSex').update({ 'id' : id})
         return question_struct['text']
 
 app = Flask(__name__)
@@ -194,8 +194,7 @@ def webhook():
 
     elif result.get('action') == 'followup':
         print(result.get('parameters'))
-        result = firebaseDB.child(case_id).child('ageSex').get()
-        for ele in result:
+        for ele in firebaseDB.child(case_id).child('ageSex').get():
             if ele.key() == 'id':
                 id = ele.val()
         print("test ",id)
@@ -203,7 +202,7 @@ def webhook():
         firebaseDB.child(case_id).child('evidence').push({
             'id' : id,
             'choice_id' : observation_value,
-            'initial' : 'False'
+            'initial' : False
         })
         text = conduct_interview()
         return make_response(jsonify({
