@@ -78,7 +78,7 @@ def call_parse(text, context=(),conc_types=('symptom', 'risk_factor',)):
     return call_endpoint('parse', request_spec)
 
 def call_diagnosis(no_groups = True):
-    result = firebaseDB.child(case_id).child('ageSex')get()
+    result = firebaseDB.child(case_id).child('ageSex').get()
     for ele in result:
         if ele.key() == 'age':
             age = ele.val()
@@ -194,7 +194,7 @@ def webhook():
 
     elif result.get('action') == 'followup':
         print(result.get('parameters'))
-        result = firebaseDB.child(case_id).child('ageSex')get()
+        result = firebaseDB.child(case_id).child('ageSex').get()
         for ele in result:
             if ele.key() == 'id':
                 id = ele.val()
