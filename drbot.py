@@ -1,9 +1,19 @@
 from flask import Flask,request,make_response,jsonify
 import uuid
 import requests
-import sqlite3
 import re, sys
-import constants
+import pyrebase
+
+firebaseConfig = {
+    'apiKey': "AIzaSyAoHKx8JhZTmp4pCIdAG5Skb0Yb14ot0DM",
+    'authDomain': "valued-proton-290112.firebaseapp.com",
+    'databaseURL': "https://valued-proton-290112.firebaseio.com",
+    'projectId': "valued-proton-290112",
+    'storageBucket': "valued-proton-290112.appspot.com",
+    'messagingSenderId': "1007447062173",
+    'appId': "1:1007447062173:web:b1767822c010956b578674",
+    'measurementId': "G-K8NE44K7DR"
+}
 
 ANSWER_NORM = {
     "yes": "present",
@@ -31,17 +41,14 @@ ANSWER_NORM = {
 
 infermedica_url = 'https://api.infermedica.com/v2/{}'
 auth_string = '2876b43e:bdf95f2d0b8ea55069b381d15eeb1f6f'
+firebase = pyrebase.initialize_app(firebaseConfig)
+firebaseDB = firebase.database()
 
 mentions = []
 diagnoses = []
 context = []
 evidence = []
 case_id = uuid.uuid4().hex
-db = sqlite3.connect('data.db', check_same_thread = False)
-cursor = db.cursor()
-cursor.execute('CREATE TABLE IF NOT EXISTS ageSex(age INT,sex VARCAHR(10),id VARCHAR)')
-cursor.execute('CREATE TABLE IF NOT EXISTS evidence(id VARCAHR(10),choice_id VARCHAR(10),initial VARCHAR(10))')
-db.commit()
 
 def _remote_headers():
     app_id, app_key = auth_string.split(':')
@@ -71,12 +78,15 @@ def call_parse(text, context=(),conc_types=('symptom', 'risk_factor',)):
     return call_endpoint('parse', request_spec)
 
 def call_diagnosis(no_groups = True):
-    for row in cursor.execute("SELECT age,sex FROM ageSex"):
-        age = row[0]
-        sex = row[1]
-    db.commit()
-    evidence = [ { 'id' : row[0], 'choice_id' : row[1], 'initial' : row[2] } for row in cursor.execute("SELECT id,choice_id,initial FROM evidence ") ]
-    db.commit()
+    result = firebaseDB.child(case_id).child('ageSex')get()
+    for ele in result:
+        if ele.key() == 'age':
+            age = ele.val()
+        elif ele.key() == 'sex':
+            sex = ele.val()
+        else:
+            print()
+    evidence = [ ele.val()  for ele in firebaseDB.child(case_id).child('evidence').get() ]
     print(evidence)
     
     request_spec = {
@@ -99,7 +109,7 @@ def get_observation_names():
         call_endpoint('risk_factors', None))
     obs_structs.extend(
         call_endpoint('symptoms', None))
-    return {struct['id']: struct['name'] for struct in obs_structs}
+    return { struct['id']: struct['name'] for struct in obs_structs }
 
 def read_complaints(text):
     portion = read_complaint_portion(text,context)
@@ -115,8 +125,11 @@ def read_complaint_portion(text,context):
 
 def mentions_to_evidence(mentions):
     for m in mentions:
-        cursor.execute("INSERT INTO evidence VALUES('%s','%s','%s')"%(m['id'],m['choice_id'],True))
-    db.commit()
+        firebaseDB.child(case_id).child('evidence').push({
+            'id' : m['id'],
+            'choice_id' : m['choice_id'],
+            'initial' : True
+        })
 
 def extract_keywords(text, keywords):
     pattern = r"|".join(r"\b{}\b".format(re.escape(keyword))for keyword in keywords)
@@ -133,9 +146,7 @@ def display(diagnoses):
         medical_name = str(key['name'])
         common_name = str(key['common_name'])
         text += medical_name + '( ' + common_name + ' )\n'
-    cursor.execute("DELETE FROM ageSex")
-    cursor.execute("DELETE FROM evidence")
-    db.commit()
+    firebaseDB.child(case_id).remove()
     text += 'This is not a complete diagnosis. Do visit your physician.'
     return text
 
@@ -152,8 +163,7 @@ def conduct_interview():
         assert len(question_items) == 1
         question_item = question_items[0]
         id = question_item.get('id')
-        cursor.execute("UPDATE ageSex SET id='%s'"%id)
-        db.commit()
+        firebaseDB.child('case_id').child('ageSex').update({ 'id' : id})
         return question_struct['text']
 
 app = Flask(__name__)
@@ -170,23 +180,31 @@ def webhook():
     req = request.get_json(silent=True, force=True)
     result = req.get('queryResult')
     if result.get('action') == 'getAgeSex':
-        cursor.execute("DELETE FROM ageSex")
-        cursor.execute("DELETE FROM evidence")
         print(result.get('parameters'))
         age = int(result.get('parameters').get('age').get('amount'))
         sex = result.get('parameters').get('sex')
-        cursor.execute("INSERT INTO ageSex VALUES('%i','%s','NULL')"%(age,sex))
-        db.commit
+        data = {
+            'age' : age,
+            'id' : '',
+            'sex' : sex
+        }
+        firebaseDB.child(case_id).child('ageSex').set(data)
         print('Age : ' + str(age) + ', sex : '+ sex)
         return 'Processing...'
 
     elif result.get('action') == 'followup':
         print(result.get('parameters'))
-        for row in cursor.execute("SELECT id FROM ageSex"):
-            id = row[0]
+        result = firebaseDB.child(case_id).child('ageSex')get()
+        for ele in result:
+            if ele.key() == 'id':
+                id = ele.val()
         print("test ",id)
         observation_value = extract_decision(result.get('queryText'), ANSWER_NORM)
-        cursor.execute("INSERT INTO evidence VALUES('%s','%s','%s')"%(id,observation_value,False))
+        firebaseDB.child(case_id).child('evidence').push({
+            'id' : id,
+            'choice_id' : observation_value,
+            'initial' : 'False'
+        })
         text = conduct_interview()
         return make_response(jsonify({
             'fulfillmentText' : text
