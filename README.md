@@ -7,7 +7,7 @@ Steps :
 
 * Add the Firebase Config and Infermedica Credentials in `drbot.py`
 
-* Run 'pip install -r requirements.txt'
+* Run `pip install -r requirements.txt`
 
 * Run the Python Flask App and provide the webhook URL in fulfillment of DialogFlow.
 
