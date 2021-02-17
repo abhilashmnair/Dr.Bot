@@ -3,11 +3,13 @@ A symptom checker with DialogFlow and Infermedica API using Flask Webhook
 
 Steps :
 
-1) Import the DialogFlow agent.
+* Import the DialogFlow agent.
 
-2) Add the Firebase Config and Infermedica Credentials in `drbot.py`
+* Add the Firebase Config and Infermedica Credentials in `drbot.py`
 
-2) Run the Python Flask App and provide the webhook URL in fulfillment of DialogFlow.
+* Run 'pip install -r requirements.txt'
+
+* Run the Python Flask App and provide the webhook URL in fulfillment of DialogFlow.
 
 That's it!
 
