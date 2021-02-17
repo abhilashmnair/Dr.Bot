@@ -4,16 +4,7 @@ import requests
 import re, sys
 import pyrebase
 
-firebaseConfig = {
-    'apiKey': "AIzaSyAoHKx8JhZTmp4pCIdAG5Skb0Yb14ot0DM",
-    'authDomain': "valued-proton-290112.firebaseapp.com",
-    'databaseURL': "https://valued-proton-290112.firebaseio.com",
-    'projectId': "valued-proton-290112",
-    'storageBucket': "valued-proton-290112.appspot.com",
-    'messagingSenderId': "1007447062173",
-    'appId': "1:1007447062173:web:b1767822c010956b578674",
-    'measurementId': "G-K8NE44K7DR"
-}
+firebaseConfig = { FIREBASE_CONFIG }
 
 ANSWER_NORM = {
     "yes": "present",
@@ -40,7 +31,7 @@ ANSWER_NORM = {
 }
 
 infermedica_url = 'https://api.infermedica.com/v2/{}'
-auth_string = '2876b43e:bdf95f2d0b8ea55069b381d15eeb1f6f'
+auth_string = 'INFERMEDICA_APP_ID:INFERMEDICA_APP_KEY'
 firebase = pyrebase.initialize_app(firebaseConfig)
 firebaseDB = firebase.database()
 
