@@ -1,6 +1,5 @@
 # Dr.Bot
 
-[![Infrastructure Tests](https://www.bridgecrew.cloud/badges/github/abhilashmnair/dr.bot/general)](https://www.bridgecrew.cloud/link/badge?vcs=github&fullRepo=abhilashmnair%2FDr.Bot&benchmark=INFRASTRUCTURE+SECURITY)
 
 A symptom checker with DialogFlow and Infermedica API using Flask Webhook
 
