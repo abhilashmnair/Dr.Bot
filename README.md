@@ -1,7 +1,6 @@
 # Dr.Bot
 
-
-A symptom checker with DialogFlow and Infermedica API using Flask Webhook
+A symptom checker with DialogFlow and Infermedica API using Flask Webhook.
 
 Steps :
 
@@ -19,4 +18,7 @@ Test your chatbot in Telegram or integrate into your website!
 
 **Enjoy**
 
-*This is made from the [Infermedica Python Demo](https://github.com/infermedica/symptom-checker-chatbot-example). Make a PR if you get a bug.* :)
+---
+
+*This is made from the [Infermedica Python Demo](https://github.com/infermedica/symptom-checker-chatbot-example). Infermedica Documentation is available [here](https://developer.infermedica.com/docs/introduction). <br>
+Make a PR if you get a bug. :)*
