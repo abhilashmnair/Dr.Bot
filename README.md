@@ -1,8 +1,11 @@
-# Dr.Bot
+# Dr.Bot 🤖
 
-A symptom checker with DialogFlow and Infermedica API using Flask Webhook.
+A symptom checker with DialogFlow and Infermedica API using Flask Webhook. Infermedica is a NLP based health diagnosis and patient triage checker.
 
-Steps :
+### How it works?
+DialogFlow acts as the interface between user and the webhook. Text received from user is transformed into wordings and passed to the Python webhook which calls the Infermedica API endpoint and receives the response. The response is then formatted and passed back to the DialogFlow agent.
+
+### How to run?
 
 * Import the DialogFlow agent.
 
